@@ -39,9 +39,9 @@ pre_build:
             sleep 15
           fi
         done
-  build:
-    commands:
-      - npm run build  # Builds the project
+build:
+  commands:
+    - npm run build  # Builds the project
 artifacts:
   files:
     - '**/*'
