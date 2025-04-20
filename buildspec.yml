@@ -4,6 +4,41 @@ phases:
   install:
     commands:
       - npm install
+pre_build:
+    commands:
+      - echo "Fetching the most recently created CloudFormation stack..."
+      - |
+        STACK_NAME=$(aws cloudformation describe-stacks \
+          --query "Stacks[?StackStatus=='CREATE_IN_PROGRESS'||StackStatus=='UPDATE_IN_PROGRESS'] | [0].StackName" \
+          --output text)
+
+        if [ -z "$STACK_NAME" ]; then
+          STACK_NAME=$(aws cloudformation describe-stacks \
+            --query "Stacks | sort_by(@, &CreationTime) | [-1].StackName" \
+            --output text)
+        fi
+
+        echo "Detected Stack: $STACK_NAME"
+
+        while true; do
+          STATUS=$(aws cloudformation describe-stacks \
+            --stack-name "$STACK_NAME" \
+            --query "Stacks[0].StackStatus" \
+            --output text)
+
+          echo "Current stack status: $STATUS"
+
+          if [[ "$STATUS" == "CREATE_COMPLETE" || "$STATUS" == "UPDATE_COMPLETE" ]]; then
+            echo "Stack is ready."
+            break
+          elif [[ "$STATUS" == *"ROLLBACK"* || "$STATUS" == *"FAILED"* ]]; then
+            echo "Stack creation or update failed: $STATUS"
+            exit 1
+          else
+            echo "Waiting for stack to complete..."
+            sleep 15
+          fi
+        done
   build:
     commands:
       - npm run build  # Builds the project
