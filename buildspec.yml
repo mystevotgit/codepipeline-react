@@ -49,6 +49,6 @@ build:
       - echo Build complete. Contents of build directory:
       - ls -al build
 artifacts:
-  base-directory: build  # Directory with output files (e.g., React app)
+  base-directory: build  # Directory with output files (e.g., React app).
   files:
     - '**/*'
