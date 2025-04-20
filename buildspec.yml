@@ -9,6 +9,8 @@ phases:
       - npm ci
 pre_build:
     commands:
+      - rm -rf build
+      - mkdir build
       - echo "Fetching the most recently created CloudFormation stack..."
       - |
         STACK_NAME=$(aws cloudformation describe-stacks \
@@ -49,5 +51,6 @@ build:
       - echo Build complete. Contents of build directory:
       - ls -al build
 artifacts:
+  base-directory: build
   files:
     - '**/*'
