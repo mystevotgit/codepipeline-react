@@ -2,8 +2,11 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      nodejs: 18
     commands:
-      - npm install
+      - echo Installing dependencies...
+      - npm ci
 pre_build:
     commands:
       - echo "Fetching the most recently created CloudFormation stack..."
@@ -41,9 +44,11 @@ pre_build:
         done
 build:
   commands:
-    - npm run build  # Builds the project
+      - echo Building React App...
+      - npm run build
+      - echo Build complete. Contents of build directory:
+      - ls -al build
 artifacts:
-  base-directory: build
+  base-directory: build  # Directory with output files (e.g., React app)
   files:
     - '**/*'
-  base-directory: build  # Directory with output files (e.g., React app)
